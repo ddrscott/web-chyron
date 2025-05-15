@@ -1,0 +1,686 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, ListChecks, Radio, ChevronDown, ChevronUp } from 'lucide-astro';
+---
+
+<Layout title="Chyron Display">
+  <main class="h-screen w-screen">
+    <!-- Chyron in the top third of the page -->
+    <div id="chyron" class="bg-base-300 bg-opacity-70 p-4 animate__animated animate__fadeInUp">
+      <div class="container mx-auto flex items-center space-x-4">
+        <div class="icon-container bg-primary text-primary-content p-3 rounded-full">
+          <Users size={28} />
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold" id="name">John Doe</h2>
+          <p class="text-lg" id="title">Software Engineer</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Control panel in the bottom third -->
+    <div class="fixed bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-4 z-10 bg-base-100 shadow-lg rounded-lg bg-opacity-90">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold flex items-center">
+          <ListChecks size={24} class="mr-2" /> Show Rundown
+        </h3>
+        <div class="flex space-x-2">
+          <button id="settingsBtn" class="btn btn-circle">
+            <Settings size={20} />
+          </button>
+          <button id="minimizeBtn" class="btn btn-circle">
+            <ChevronDown size={20} />
+          </button>
+        </div>
+      </div>
+      
+      <div id="rundownContainer" class="overflow-y-auto max-h-[40vh]">
+        <div class="tabs tabs-boxed mb-4 p-1 bg-base-300 rounded-lg">
+          <button class="tab tab-active text-lg font-semibold px-6 py-3 border-b-2 border-primary" id="segmentsTab">Segments</button>
+          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="scriptTab">Script</button>
+          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="guestsTab">Guests</button>
+          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="visualsTab">Visuals</button>
+        </div>
+        
+        <!-- Segments Tab Content -->
+        <div id="segmentsContent" class="space-y-4">
+          <div class="segment-list space-y-2">
+            <!-- Default segments -->
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Introduction</h4>
+                    <p class="text-sm" contenteditable="true">Welcome and show overview</p>
+                  </div>
+                </div>
+                <span class="badge">00:00</span>
+              </div>
+            </div>
+            
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">News Recap</h4>
+                    <p class="text-sm" contenteditable="true">This week's tech highlights</p>
+                  </div>
+                </div>
+                <span class="badge">05:00</span>
+              </div>
+            </div>
+            
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Guest Interview</h4>
+                    <p class="text-sm" contenteditable="true">Sarah Johnson, AI Researcher</p>
+                  </div>
+                </div>
+                <span class="badge">15:00</span>
+              </div>
+            </div>
+            
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Demo Segment</h4>
+                    <p class="text-sm" contenteditable="true">Live code demonstration</p>
+                  </div>
+                </div>
+                <span class="badge">30:00</span>
+              </div>
+            </div>
+            
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Q&A Session</h4>
+                    <p class="text-sm" contenteditable="true">Audience questions</p>
+                  </div>
+                </div>
+                <span class="badge">45:00</span>
+              </div>
+            </div>
+            
+            <div class="segment-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Closing Remarks</h4>
+                    <p class="text-sm" contenteditable="true">Summary and next week's preview</p>
+                  </div>
+                </div>
+                <span class="badge">55:00</span>
+              </div>
+            </div>
+          </div>
+          
+          <button id="addSegmentBtn" class="btn btn-outline btn-sm w-full">Add Segment</button>
+        </div>
+        
+        <!-- Script Tab Content (Hidden by default) -->
+        <div id="scriptContent" class="hidden">
+          <textarea id="scriptText" class="textarea textarea-bordered w-full h-64" placeholder="Write your show script here...">
+# Show Script
+
+## Introduction
+- Welcome viewers to the show
+- Introduce today's topics
+- Brief overview of the schedule
+
+## News Recap
+- Tech story 1: Latest Apple announcements
+- Tech story 2: AI developments this week
+- Tech story 3: Open source highlights
+
+## Guest Interview
+- Introduce Sarah Johnson, AI Researcher
+- Question 1: What's your background in AI?
+- Question 2: Current projects and research
+- Question 3: Future of AI ethics
+
+## Demo Segment
+- Setup the demonstration environment
+- Show key features and functionality
+- Explain technical concepts
+
+## Q&A Session
+- Address viewer questions from chat
+- Dive deeper on popular topics
+
+## Closing Remarks
+- Summarize key takeaways
+- Preview next week's topics
+- Thank viewers and sponsors
+          </textarea>
+        </div>
+        
+        <!-- Guests Tab Content (Hidden by default) -->
+        <div id="guestsContent" class="hidden space-y-4">
+          <div class="guest-list space-y-2">
+            <div class="guest-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Sarah Johnson</h4>
+                    <p class="text-sm" contenteditable="true">AI Research Lead, OpenMind Labs</p>
+                  </div>
+                </div>
+                <Radio size={16} />
+              </div>
+            </div>
+            
+            <div class="guest-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">David Chen</h4>
+                    <p class="text-sm" contenteditable="true">Full Stack Developer, TechStart</p>
+                  </div>
+                </div>
+                <Radio size={16} />
+              </div>
+            </div>
+            
+            <div class="guest-item card bg-base-200 p-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
+                    <ChevronRight size={16} />
+                  </button>
+                  <div>
+                    <h4 class="font-bold" contenteditable="true">Maria Rodriguez</h4>
+                    <p class="text-sm" contenteditable="true">Product Design Director, UXFlow</p>
+                  </div>
+                </div>
+                <Radio size={16} />
+              </div>
+            </div>
+          </div>
+          
+          <button id="addGuestBtn" class="btn btn-outline btn-sm w-full">Add Guest</button>
+        </div>
+        
+        <!-- Visuals Tab Content (Hidden by default) -->
+        <div id="visualsContent" class="hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Name</span>
+              </label>
+              <input 
+                type="text" 
+                class="input input-bordered" 
+                id="nameInput" 
+                value="John Doe"
+                oninput="document.getElementById('name').textContent = this.value"
+              />
+            </div>
+            
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Title</span>
+              </label>
+              <input 
+                type="text" 
+                class="input input-bordered" 
+                id="titleInput" 
+                value="Software Engineer"
+                oninput="document.getElementById('title').textContent = this.value"
+              />
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Icon</span>
+              </label>
+              <div class="join">
+                <button class="join-item btn" id="userIcon">
+                  <Users size={16} />
+                </button>
+                <button class="join-item btn" id="awardIcon">
+                  <Award size={16} />
+                </button>
+                <button class="join-item btn" id="infoIcon">
+                  <Info size={16} />
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Position</span>
+              </label>
+              <div class="join">
+                <input class="join-item btn" type="radio" name="position" aria-label="Top" id="positionTop" checked />
+                <input class="join-item btn" type="radio" name="position" aria-label="Middle" id="positionMiddle" />
+                <input class="join-item btn" type="radio" name="position" aria-label="Bottom" id="positionBottom" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Style</span>
+              </label>
+              <div class="join">
+                <input class="join-item btn" type="radio" name="options" aria-label="Default" id="styleDefault" checked />
+                <input class="join-item btn" type="radio" name="options" aria-label="Centered" id="styleCentered" />
+                <input class="join-item btn" type="radio" name="options" aria-label="Minimal" id="styleMinimal" />
+              </div>
+            </div>
+            
+            <div class="form-control flex justify-end items-end">
+              <button 
+                class="btn btn-primary w-full"
+                id="animateBtn"
+              >
+                <RefreshCw size={16} class="mr-2" /> Animate
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Core elements
+      const nameInput = document.getElementById('nameInput');
+      const titleInput = document.getElementById('titleInput');
+      const nameDisplay = document.getElementById('name');
+      const titleDisplay = document.getElementById('title');
+      const chyron = document.getElementById('chyron');
+      const animateBtn = document.getElementById('animateBtn');
+      const iconContainer = document.querySelector('.icon-container');
+      
+      // Add event listener for all contenteditable elements to handle Enter key
+      document.querySelectorAll('[contenteditable="true"]').forEach(element => {
+        element.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+            return false;
+          }
+        });
+      });
+      
+      // Control panel elements
+      const settingsBtn = document.getElementById('settingsBtn');
+      const settingsModal = document.getElementById('settingsModal');
+      const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+      const minimizeBtn = document.getElementById('minimizeBtn');
+      const rundownContainer = document.getElementById('rundownContainer');
+      
+      // Tabs
+      const segmentsTab = document.getElementById('segmentsTab');
+      const scriptTab = document.getElementById('scriptTab');
+      const guestsTab = document.getElementById('guestsTab');
+      const segmentsContent = document.getElementById('segmentsContent');
+      const scriptContent = document.getElementById('scriptContent');
+      const guestsContent = document.getElementById('guestsContent');
+      
+      // Buttons
+      const addSegmentBtn = document.getElementById('addSegmentBtn');
+      const addGuestBtn = document.getElementById('addGuestBtn');
+      const useSegmentBtns = document.querySelectorAll('.use-segment-btn');
+      const useGuestBtns = document.querySelectorAll('.use-guest-btn');
+      
+      // Icon buttons
+      const userIcon = document.getElementById('userIcon');
+      const awardIcon = document.getElementById('awardIcon');
+      const infoIcon = document.getElementById('infoIcon');
+      
+      // Position radio buttons
+      const positionTop = document.getElementById('positionTop');
+      const positionMiddle = document.getElementById('positionMiddle');
+      const positionBottom = document.getElementById('positionBottom');
+      
+      // Style radio buttons
+      const styleDefault = document.getElementById('styleDefault');
+      const styleCentered = document.getElementById('styleCentered');
+      const styleMinimal = document.getElementById('styleMinimal');
+      
+      // Load saved values
+      if (localStorage.getItem('chyronName')) {
+        nameInput.value = localStorage.getItem('chyronName');
+        nameDisplay.textContent = localStorage.getItem('chyronName');
+      }
+      
+      if (localStorage.getItem('chyronTitle')) {
+        titleInput.value = localStorage.getItem('chyronTitle');
+        titleDisplay.textContent = localStorage.getItem('chyronTitle');
+      }
+      
+      if (localStorage.getItem('chyronIcon')) {
+        iconContainer.innerHTML = localStorage.getItem('chyronIcon');
+      }
+      
+      if (localStorage.getItem('chyronPosition')) {
+        const savedPosition = localStorage.getItem('chyronPosition');
+        if (savedPosition === 'middle') {
+          positionMiddle.checked = true;
+          chyron.classList.remove('mt-20');
+          chyron.classList.add('mt-[40vh]');
+        } else if (savedPosition === 'bottom') {
+          positionBottom.checked = true;
+          chyron.classList.remove('mt-20');
+          chyron.classList.add('mt-[80vh]');
+        }
+      }
+      
+      if (localStorage.getItem('chyronStyle')) {
+        const savedStyle = localStorage.getItem('chyronStyle');
+        if (savedStyle === 'centered') {
+          styleCentered.checked = true;
+          chyron.classList.add('flex', 'justify-center');
+        } else if (savedStyle === 'minimal') {
+          styleMinimal.checked = true;
+          chyron.classList.add('bg-opacity-30');
+        }
+      }
+      
+      // Script content
+      if (localStorage.getItem('scriptContent')) {
+        document.getElementById('scriptText').value = localStorage.getItem('scriptContent');
+      }
+      
+      // Save values on input
+      nameInput.addEventListener('input', () => {
+        localStorage.setItem('chyronName', nameInput.value);
+      });
+      
+      titleInput.addEventListener('input', () => {
+        localStorage.setItem('chyronTitle', titleInput.value);
+      });
+      
+      // Settings modal toggle
+      settingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('modal-open');
+      });
+      
+      closeSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('modal-open');
+      });
+      
+      // Minimize/maximize rundown
+      let isMinimized = false;
+      minimizeBtn.addEventListener('click', () => {
+        if (isMinimized) {
+          rundownContainer.classList.remove('hidden');
+          minimizeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
+        } else {
+          rundownContainer.classList.add('hidden');
+          minimizeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>';
+        }
+        isMinimized = !isMinimized;
+      });
+      
+      // Tab switching
+      const visualsTab = document.getElementById('visualsTab');
+      const visualsContent = document.getElementById('visualsContent');
+      
+      // Function to hide all content panels
+      const hideAllContent = () => {
+        segmentsContent.classList.add('hidden');
+        scriptContent.classList.add('hidden');
+        guestsContent.classList.add('hidden');
+        visualsContent.classList.add('hidden');
+      };
+      
+      // Function to remove active styling from all tabs
+      const deactivateAllTabs = () => {
+        segmentsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
+        scriptTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
+        guestsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
+        visualsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
+      };
+      
+      segmentsTab.addEventListener('click', () => {
+        deactivateAllTabs();
+        segmentsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        
+        hideAllContent();
+        segmentsContent.classList.remove('hidden');
+      });
+      
+      scriptTab.addEventListener('click', () => {
+        deactivateAllTabs();
+        scriptTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        
+        hideAllContent();
+        scriptContent.classList.remove('hidden');
+      });
+      
+      guestsTab.addEventListener('click', () => {
+        deactivateAllTabs();
+        guestsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        
+        hideAllContent();
+        guestsContent.classList.remove('hidden');
+      });
+      
+      visualsTab.addEventListener('click', () => {
+        deactivateAllTabs();
+        visualsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        
+        hideAllContent();
+        visualsContent.classList.remove('hidden');
+      });
+      
+      // Add segment
+      addSegmentBtn.addEventListener('click', () => {
+        const segmentList = document.querySelector('.segment-list');
+        const newSegment = document.createElement('div');
+        newSegment.className = 'segment-item card bg-base-200 p-2';
+        newSegment.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div class="flex items-center">
+              <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <div>
+                <h4 class="font-bold" contenteditable="true">New Segment</h4>
+                <p class="text-sm" contenteditable="true">Segment description</p>
+              </div>
+            </div>
+            <span class="badge" contenteditable="true">00:00</span>
+          </div>
+        `;
+        segmentList.appendChild(newSegment);
+        
+        // Add event listener to the new segment's use button
+        newSegment.querySelector('.use-segment-btn').addEventListener('click', useSegmentHandler);
+      });
+      
+      // Add guest
+      addGuestBtn.addEventListener('click', () => {
+        const guestList = document.querySelector('.guest-list');
+        const newGuest = document.createElement('div');
+        newGuest.className = 'guest-item card bg-base-200 p-2';
+        newGuest.innerHTML = `
+          <div class="flex justify-between items-center">
+            <div class="flex items-center">
+              <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <div>
+                <h4 class="font-bold" contenteditable="true">New Guest</h4>
+                <p class="text-sm" contenteditable="true">Guest title and organization</p>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-radio"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+          </div>
+        `;
+        guestList.appendChild(newGuest);
+        
+        // Add event listener to the new guest's use button
+        newGuest.querySelector('.use-guest-btn').addEventListener('click', useGuestHandler);
+      });
+      
+      // Use segment handler
+      function useSegmentHandler(e) {
+        const segmentItem = e.currentTarget.closest('.segment-item');
+        const segmentName = segmentItem.querySelector('h4').textContent;
+        const segmentDescription = segmentItem.querySelector('p').textContent;
+        
+        // Update chyron with segment info
+        nameDisplay.textContent = segmentName;
+        titleDisplay.textContent = segmentDescription;
+        localStorage.setItem('chyronName', segmentName);
+        localStorage.setItem('chyronTitle', segmentDescription);
+        
+        // Update input fields in settings
+        nameInput.value = segmentName;
+        titleInput.value = segmentDescription;
+        
+        // Animate the chyron
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      }
+      
+      // Add event listeners to use segment buttons
+      useSegmentBtns.forEach(btn => {
+        btn.addEventListener('click', useSegmentHandler);
+      });
+      
+      // Use guest handler
+      function useGuestHandler(e) {
+        const guestItem = e.currentTarget.closest('.guest-item');
+        const guestName = guestItem.querySelector('h4').textContent;
+        const guestTitle = guestItem.querySelector('p').textContent;
+        
+        // Update chyron with guest info
+        nameDisplay.textContent = guestName;
+        titleDisplay.textContent = guestTitle;
+        localStorage.setItem('chyronName', guestName);
+        localStorage.setItem('chyronTitle', guestTitle);
+        
+        // Update input fields in settings
+        nameInput.value = guestName;
+        titleInput.value = guestTitle;
+        
+        // Animate the chyron
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      }
+      
+      // Add event listeners to use guest buttons
+      useGuestBtns.forEach(btn => {
+        btn.addEventListener('click', useGuestHandler);
+      });
+      
+      // Save script content
+      document.getElementById('scriptText').addEventListener('input', (e) => {
+        localStorage.setItem('scriptContent', e.target.value);
+      });
+      
+      // Icon selection
+      userIcon.addEventListener('click', () => {
+        iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+      });
+      
+      awardIcon.addEventListener('click', () => {
+        iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>';
+        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+      });
+      
+      infoIcon.addEventListener('click', () => {
+        iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+      });
+      
+      // Position selection
+      positionTop.addEventListener('change', () => {
+        if (positionTop.checked) {
+          chyron.classList.remove('mt-[40vh]', 'mt-[80vh]');
+          chyron.classList.add('mt-20');
+          localStorage.setItem('chyronPosition', 'top');
+        }
+      });
+      
+      positionMiddle.addEventListener('change', () => {
+        if (positionMiddle.checked) {
+          chyron.classList.remove('mt-20', 'mt-[80vh]');
+          chyron.classList.add('mt-[40vh]');
+          localStorage.setItem('chyronPosition', 'middle');
+        }
+      });
+      
+      positionBottom.addEventListener('change', () => {
+        if (positionBottom.checked) {
+          chyron.classList.remove('mt-20', 'mt-[40vh]');
+          chyron.classList.add('mt-[80vh]');
+          localStorage.setItem('chyronPosition', 'bottom');
+        }
+      });
+      
+      // Style selection
+      styleDefault.addEventListener('change', () => {
+        if (styleDefault.checked) {
+          chyron.classList.remove('flex', 'justify-center', 'bg-opacity-30');
+          chyron.classList.add('bg-opacity-70');
+          localStorage.setItem('chyronStyle', 'default');
+        }
+      });
+      
+      styleCentered.addEventListener('change', () => {
+        if (styleCentered.checked) {
+          chyron.classList.remove('bg-opacity-30');
+          chyron.classList.add('flex', 'justify-center', 'bg-opacity-70');
+          localStorage.setItem('chyronStyle', 'centered');
+        }
+      });
+      
+      styleMinimal.addEventListener('change', () => {
+        if (styleMinimal.checked) {
+          chyron.classList.remove('flex', 'justify-center', 'bg-opacity-70');
+          chyron.classList.add('bg-opacity-30');
+          localStorage.setItem('chyronStyle', 'minimal');
+        }
+      });
+      
+      // Animation
+      animateBtn.addEventListener('click', () => {
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      });
+    });
+  </script>
+</Layout>
