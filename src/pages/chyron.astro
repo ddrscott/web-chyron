@@ -6,7 +6,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
 <Layout title="Chyron Display">
   <main class="h-screen w-screen bg-base-200">
     <!-- Chyron in the top third of the page -->
-    <div id="chyron" class="bg-base-100 shadow-lg p-4 animate__animated animate__fadeInUp mt-20">
+    <div id="chyron" class="shadow-lg p-12 animate__animated animate__fadeInUp">
       <div class="container mx-auto flex items-center space-x-4">
         <div class="icon-container bg-primary text-primary-content p-3 rounded-full shadow-md">
           <Users size={28} />
@@ -18,7 +18,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       </div>
     </div>
     
-    <!-- Control panel in the bottom third -->
+    <!-- Control panel with tabs on the left -->
     <div class="fixed bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-6 z-10 bg-base-100 shadow-xl rounded-box">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold flex items-center text-primary">
@@ -34,18 +34,20 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         </div>
       </div>
       
-      <div id="rundownContainer" class="overflow-y-auto max-h-[70vh]">
-        <div class="tabs tabs-lifted mb-6">
-          <button class="tab tab-active text-md font-medium tab-bordered border-primary" id="segmentsTab">Segments</button>
-          <button class="tab text-md font-medium" id="scriptTab">Script</button>
-          <button class="tab text-md font-medium" id="guestsTab">Guests</button>
-          <button class="tab text-md font-medium" id="visualsTab">Visuals</button>
-        </div>
-        
-        <!-- Segments Tab Content -->
-        <div id="segmentsContent" class="space-y-4">
-          <div class="segment-list space-y-2">
-            <!-- Default segments -->
+      <div id="rundownContainer" class="overflow-y-auto flex-1">
+        <div class="flex">
+          <div class="tabs tabs-vertical tabs-boxed h-full w-40 mr-4 flex flex-col">
+            <button class="tab tab-active text-md font-medium w-full justify-start px-4 py-3 mb-1 bg-primary text-primary-content" id="segmentsTab">Segments</button>
+            <button class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="scriptTab">Script</button>
+            <button class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="guestsTab">Guests</button>
+            <button class="tab text-md font-medium w-full justify-start px-4 py-3 hover:bg-base-300" id="visualsTab">Visuals</button>
+          </div>
+          
+          <div class="flex-1">
+            <!-- Segments Tab Content -->
+            <div id="segmentsContent" class="space-y-4">
+              <div class="segment-list space-y-2">
+                <!-- Default segments -->
             <div class="segment-item card bg-base-100 p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div class="flex justify-between items-center">
                 <div class="flex items-center">
@@ -229,10 +231,10 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
           </div>
           
           <button id="addGuestBtn" class="btn btn-outline btn-sm w-full">Add Guest</button>
-        </div>
-        
-        <!-- Visuals Tab Content (Hidden by default) -->
-        <div id="visualsContent" class="hidden space-y-6">
+            </div>
+            
+            <!-- Visuals Tab Content (Hidden by default) -->
+            <div id="visualsContent" class="hidden space-y-6">
           <div class="card bg-base-100 shadow-sm p-5">
             <div class="card-title pb-2 text-primary">Chyron Text</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -317,6 +319,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
                 >
                   <RefreshCw size={16} class="mr-2" /> Animate
                 </button>
+              </div>
               </div>
             </div>
           </div>
@@ -512,15 +515,15 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       
       // Function to remove active styling from all tabs
       const deactivateAllTabs = () => {
-        segmentsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
-        scriptTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
-        guestsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
-        visualsTab.classList.remove('tab-active', 'border-b-2', 'border-primary');
+        segmentsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+        scriptTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+        guestsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+        visualsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
       };
       
       segmentsTab.addEventListener('click', () => {
         deactivateAllTabs();
-        segmentsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        segmentsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
         
         hideAllContent();
         segmentsContent.classList.remove('hidden');
@@ -528,7 +531,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       
       scriptTab.addEventListener('click', () => {
         deactivateAllTabs();
-        scriptTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        scriptTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
         
         hideAllContent();
         scriptContent.classList.remove('hidden');
@@ -536,7 +539,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       
       guestsTab.addEventListener('click', () => {
         deactivateAllTabs();
-        guestsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        guestsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
         
         hideAllContent();
         guestsContent.classList.remove('hidden');
@@ -544,7 +547,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       
       visualsTab.addEventListener('click', () => {
         deactivateAllTabs();
-        visualsTab.classList.add('tab-active', 'border-b-2', 'border-primary');
+        visualsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
         
         hideAllContent();
         visualsContent.classList.remove('hidden');
