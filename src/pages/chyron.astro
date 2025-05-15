@@ -4,60 +4,60 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
 ---
 
 <Layout title="Chyron Display">
-  <main class="h-screen w-screen">
+  <main class="h-screen w-screen bg-base-200">
     <!-- Chyron in the top third of the page -->
-    <div id="chyron" class="bg-base-300 bg-opacity-70 p-4 animate__animated animate__fadeInUp">
+    <div id="chyron" class="bg-base-100 shadow-lg p-4 animate__animated animate__fadeInUp mt-20">
       <div class="container mx-auto flex items-center space-x-4">
-        <div class="icon-container bg-primary text-primary-content p-3 rounded-full">
+        <div class="icon-container bg-primary text-primary-content p-3 rounded-full shadow-md">
           <Users size={28} />
         </div>
         <div>
-          <h2 class="text-2xl font-bold" id="name">John Doe</h2>
-          <p class="text-lg" id="title">Software Engineer</p>
+          <h2 class="text-2xl font-bold text-primary" id="name">John Doe</h2>
+          <p class="text-lg text-base-content" id="title">Software Engineer</p>
         </div>
       </div>
     </div>
     
     <!-- Control panel in the bottom third -->
-    <div class="fixed bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-4 z-10 bg-base-100 shadow-lg rounded-lg bg-opacity-90">
+    <div class="fixed bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-6 z-10 bg-base-100 shadow-xl rounded-box">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold flex items-center">
+        <h3 class="text-xl font-bold flex items-center text-primary">
           <ListChecks size={24} class="mr-2" /> Show Rundown
         </h3>
         <div class="flex space-x-2">
-          <button id="settingsBtn" class="btn btn-circle">
+          <button id="settingsBtn" class="btn btn-circle btn-primary btn-outline">
             <Settings size={20} />
           </button>
-          <button id="minimizeBtn" class="btn btn-circle">
+          <button id="minimizeBtn" class="btn btn-circle btn-secondary">
             <ChevronDown size={20} />
           </button>
         </div>
       </div>
       
-      <div id="rundownContainer" class="overflow-y-auto max-h-[40vh]">
-        <div class="tabs tabs-boxed mb-4 p-1 bg-base-300 rounded-lg">
-          <button class="tab tab-active text-lg font-semibold px-6 py-3 border-b-2 border-primary" id="segmentsTab">Segments</button>
-          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="scriptTab">Script</button>
-          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="guestsTab">Guests</button>
-          <button class="tab text-lg font-semibold px-6 py-3 hover:bg-base-200" id="visualsTab">Visuals</button>
+      <div id="rundownContainer" class="overflow-y-auto max-h-[70vh]">
+        <div class="tabs tabs-lifted mb-6">
+          <button class="tab tab-active text-md font-medium tab-bordered border-primary" id="segmentsTab">Segments</button>
+          <button class="tab text-md font-medium" id="scriptTab">Script</button>
+          <button class="tab text-md font-medium" id="guestsTab">Guests</button>
+          <button class="tab text-md font-medium" id="visualsTab">Visuals</button>
         </div>
         
         <!-- Segments Tab Content -->
         <div id="segmentsContent" class="space-y-4">
           <div class="segment-list space-y-2">
             <!-- Default segments -->
-            <div class="segment-item card bg-base-200 p-2">
+            <div class="segment-item card bg-base-100 p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
+                  <button class="btn btn-sm btn-circle btn-primary mr-3 use-segment-btn">
                     <ChevronRight size={16} />
                   </button>
                   <div>
-                    <h4 class="font-bold" contenteditable="true">Introduction</h4>
-                    <p class="text-sm" contenteditable="true">Welcome and show overview</p>
+                    <h4 class="font-bold text-primary" contenteditable="true">Introduction</h4>
+                    <p class="text-sm opacity-80" contenteditable="true">Welcome and show overview</p>
                   </div>
                 </div>
-                <span class="badge">00:00</span>
+                <span class="badge badge-primary badge-outline">00:00</span>
               </div>
             </div>
             
@@ -137,12 +137,13 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
             </div>
           </div>
           
-          <button id="addSegmentBtn" class="btn btn-outline btn-sm w-full">Add Segment</button>
+          <button id="addSegmentBtn" class="btn btn-primary btn-outline btn-sm w-full">Add Segment</button>
         </div>
         
         <!-- Script Tab Content (Hidden by default) -->
         <div id="scriptContent" class="hidden">
-          <textarea id="scriptText" class="textarea textarea-bordered w-full h-64" placeholder="Write your show script here...">
+          <div class="card bg-base-100 shadow-sm p-4">
+            <textarea id="scriptText" class="textarea textarea-bordered w-full h-64 focus:textarea-primary" placeholder="Write your show script here...">
 # Show Script
 
 ## Introduction
@@ -174,7 +175,8 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
 - Summarize key takeaways
 - Preview next week's topics
 - Thank viewers and sponsors
-          </textarea>
+            </textarea>
+          </div>
         </div>
         
         <!-- Guests Tab Content (Hidden by default) -->
@@ -230,90 +232,138 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         </div>
         
         <!-- Visuals Tab Content (Hidden by default) -->
-        <div id="visualsContent" class="hidden space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Name</span>
-              </label>
-              <input 
-                type="text" 
-                class="input input-bordered" 
-                id="nameInput" 
-                value="John Doe"
-                oninput="document.getElementById('name').textContent = this.value"
-              />
-            </div>
-            
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Title</span>
-              </label>
-              <input 
-                type="text" 
-                class="input input-bordered" 
-                id="titleInput" 
-                value="Software Engineer"
-                oninput="document.getElementById('title').textContent = this.value"
-              />
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Icon</span>
-              </label>
-              <div class="join">
-                <button class="join-item btn" id="userIcon">
-                  <Users size={16} />
-                </button>
-                <button class="join-item btn" id="awardIcon">
-                  <Award size={16} />
-                </button>
-                <button class="join-item btn" id="infoIcon">
-                  <Info size={16} />
-                </button>
+        <div id="visualsContent" class="hidden space-y-6">
+          <div class="card bg-base-100 shadow-sm p-5">
+            <div class="card-title pb-2 text-primary">Chyron Text</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Name</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="input input-bordered input-primary" 
+                  id="nameInput" 
+                  value="John Doe"
+                  oninput="document.getElementById('name').textContent = this.value"
+                />
               </div>
-            </div>
-            
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Position</span>
-              </label>
-              <div class="join">
-                <input class="join-item btn" type="radio" name="position" aria-label="Top" id="positionTop" checked />
-                <input class="join-item btn" type="radio" name="position" aria-label="Middle" id="positionMiddle" />
-                <input class="join-item btn" type="radio" name="position" aria-label="Bottom" id="positionBottom" />
+              
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Title</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="input input-bordered input-primary" 
+                  id="titleInput" 
+                  value="Software Engineer"
+                  oninput="document.getElementById('title').textContent = this.value"
+                />
               </div>
             </div>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Style</span>
-              </label>
-              <div class="join">
-                <input class="join-item btn" type="radio" name="options" aria-label="Default" id="styleDefault" checked />
-                <input class="join-item btn" type="radio" name="options" aria-label="Centered" id="styleCentered" />
-                <input class="join-item btn" type="radio" name="options" aria-label="Minimal" id="styleMinimal" />
+          <div class="card bg-base-100 shadow-sm p-5">
+            <div class="card-title pb-2 text-primary">Appearance</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Icon</span>
+                </label>
+                <div class="join">
+                  <button class="join-item btn btn-sm btn-primary" id="userIcon">
+                    <Users size={16} />
+                  </button>
+                  <button class="join-item btn btn-sm" id="awardIcon">
+                    <Award size={16} />
+                  </button>
+                  <button class="join-item btn btn-sm" id="infoIcon">
+                    <Info size={16} />
+                  </button>
+                </div>
+              </div>
+              
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Position</span>
+                </label>
+                <div class="btn-group">
+                  <input class="btn btn-sm btn-primary" type="radio" name="position" aria-label="Top" id="positionTop" checked />
+                  <input class="btn btn-sm" type="radio" name="position" aria-label="Middle" id="positionMiddle" />
+                  <input class="btn btn-sm" type="radio" name="position" aria-label="Bottom" id="positionBottom" />
+                </div>
               </div>
             </div>
             
-            <div class="form-control flex justify-end items-end">
-              <button 
-                class="btn btn-primary w-full"
-                id="animateBtn"
-              >
-                <RefreshCw size={16} class="mr-2" /> Animate
-              </button>
+            <div class="divider"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Style</span>
+                </label>
+                <div class="btn-group">
+                  <input class="btn btn-sm btn-primary" type="radio" name="options" aria-label="Default" id="styleDefault" checked />
+                  <input class="btn btn-sm" type="radio" name="options" aria-label="Centered" id="styleCentered" />
+                  <input class="btn btn-sm" type="radio" name="options" aria-label="Minimal" id="styleMinimal" />
+                </div>
+              </div>
+              
+              <div class="form-control mt-8">
+                <button 
+                  class="btn btn-secondary w-full"
+                  id="animateBtn"
+                >
+                  <RefreshCw size={16} class="mr-2" /> Animate
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Settings Modal (hidden by default) -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-box bg-base-100">
+      <h3 class="font-bold text-lg text-primary">Additional Settings</h3>
+      
+      <div class="form-control mt-4">
+        <label class="label">
+          <span class="label-text font-medium">Theme Options</span>
+        </label>
+        <select class="select select-bordered w-full">
+          <option selected>Cupcake (default)</option>
+          <option>Light</option>
+          <option>Dark</option>
+          <option>Retro</option>
+          <option>Cyberpunk</option>
+        </select>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-4">
+          <input type="checkbox" class="toggle toggle-primary" />
+          <span class="label-text">Auto-save changes</span>
+        </label>
+      </div>
+      
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-4">
+          <input type="checkbox" class="toggle toggle-primary" />
+          <span class="label-text">Show timecodes</span>
+        </label>
+      </div>
+      
+      <div class="modal-action">
+        <button id="closeSettingsBtn" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
