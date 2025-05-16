@@ -1,0 +1,40 @@
+---
+// Segment item component for the chyron app
+// Props definition
+interface Props {
+  id: string;
+  name: string;
+  description: string;
+  timecode: string;
+  isActive?: boolean;
+}
+
+// Destructure the props
+const { id, name, description, timecode, isActive = false } = Astro.props;
+
+// Determine styling based on active state
+const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+---
+
+<div class={`segment-item card ${cardClass} p-2`} data-id={id}>
+  <div class="flex justify-between items-center">
+    <div class="flex items-center">
+      <button class={`btn btn-sm btn-circle ${buttonClass} mr-2 use-segment-btn`} type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+      <div>
+        <h4 class="font-bold" contenteditable="true">{name}</h4>
+        <p class="text-sm" contenteditable="true">{description}</p>
+      </div>
+    </div>
+    <span class="badge" contenteditable="true">{timecode}</span>
+  </div>
+</div>
+
+<script>
+  // Client-side script will be added by the parent component
+  // This is to avoid duplication of event handlers
+</script>

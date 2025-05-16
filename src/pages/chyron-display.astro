@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Users, Award, Info } from 'lucide-astro';
+
+// Default data for initial render
+// Client-side JavaScript will replace with localStorage data
+const defaultData = {
+  settings: {
+    chyron: {
+      name: "John Doe",
+      title: "Software Engineer",
+      icon: "users",
+      position: "top", 
+      style: "default"
+    },
+    display: {
+      theme: "cupcake"
+    }
+  }
+};
+---
+
+<Layout title="Chyron Display Only">
+  <main class="h-screen w-screen bg-transparent">
+    <!-- Chyron display only - no controls -->
+    <div id="chyron" class="shadow-lg p-12 animate__animated animate__fadeInUp">
+      <div class="container mx-auto flex items-center space-x-4">
+        <div class="icon-container bg-primary text-primary-content p-3 rounded-full shadow-md">
+          {defaultData.settings.chyron.icon === 'users' && <Users size={28} />}
+          {defaultData.settings.chyron.icon === 'award' && <Award size={28} />}
+          {defaultData.settings.chyron.icon === 'info' && <Info size={28} />}
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-primary" id="name">{defaultData.settings.chyron.name}</h2>
+          <p class="text-lg text-base-content" id="title">{defaultData.settings.chyron.title}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load data from localStorage
+      const STORAGE_KEY = 'chyron_app_data';
+      
+      // Get localStorage data or use defaults
+      let appData = {
+        settings: {
+          chyron: {
+            name: "John Doe",
+            title: "Software Engineer",
+            icon: "users",
+            position: "top",
+            style: "default"
+          },
+          display: {
+            theme: "cupcake"
+          }
+        }
+      };
+      
+      try {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        if (storedData) {
+          appData = JSON.parse(storedData);
+        }
+      } catch (error) {
+        console.error('Failed to load data from localStorage', error);
+      }
+      
+      // Update the display
+      const nameDisplay = document.getElementById('name');
+      const titleDisplay = document.getElementById('title');
+      const chyron = document.getElementById('chyron');
+      const iconContainer = document.querySelector('.icon-container');
+      
+      // Update name and title
+      if (nameDisplay && appData.settings?.chyron?.name) {
+        nameDisplay.textContent = appData.settings.chyron.name;
+      }
+      if (titleDisplay && appData.settings?.chyron?.title) {
+        titleDisplay.textContent = appData.settings.chyron.title;
+      }
+      
+      // Update theme
+      if (appData.settings?.display?.theme) {
+        document.documentElement.setAttribute('data-theme', appData.settings.display.theme);
+      }
+      
+      // Update icon
+      if (iconContainer && appData.settings?.chyron?.icon) {
+        if (appData.settings.chyron.icon === 'users') {
+          iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        } else if (appData.settings.chyron.icon === 'award') {
+          iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>';
+        } else if (appData.settings.chyron.icon === 'info') {
+          iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+        }
+      }
+      
+      // Apply position
+      if (chyron && appData.settings?.chyron?.position) {
+        // Clear existing positions
+        chyron.classList.remove('mt-20', 'mt-[40vh]', 'mt-[80vh]');
+        
+        // Apply new position
+        if (appData.settings.chyron.position === 'middle') {
+          chyron.classList.add('mt-[40vh]');
+        } else if (appData.settings.chyron.position === 'bottom') {
+          chyron.classList.add('mt-[80vh]');
+        } else { // default: top
+          chyron.classList.add('mt-20');
+        }
+      }
+      
+      // Apply style
+      if (chyron && appData.settings?.chyron?.style) {
+        // Clear existing styles
+        chyron.classList.remove('flex', 'justify-center', 'bg-opacity-30', 'bg-opacity-70');
+        
+        // Apply new style
+        if (appData.settings.chyron.style === 'centered') {
+          chyron.classList.add('flex', 'justify-center', 'bg-opacity-70');
+        } else if (appData.settings.chyron.style === 'minimal') {
+          chyron.classList.add('bg-opacity-30');
+        } else { // default
+          chyron.classList.add('bg-opacity-70');
+        }
+      }
+      
+      // Listen for storage events to update in real-time
+      window.addEventListener('storage', function(e) {
+        if (e.key === STORAGE_KEY) {
+          location.reload(); // Simple refresh to apply new settings
+        }
+      });
+      
+      // Animate the chyron on load
+      if (chyron) {
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      }
+    });
+  </script>
+</Layout>

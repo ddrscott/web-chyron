@@ -1,6 +1,85 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, ListChecks, Radio, ChevronDown, ChevronUp } from 'lucide-astro';
+import SegmentItem from '../components/SegmentItem.astro';
+import GuestItem from '../components/GuestItem.astro';
+
+// This will run on the server at build time - we need to provide default data
+// that will be used for initial rendering
+// Will be populated from localStorage on the client side
+const defaultData = {
+  segments: [
+    {
+      id: '1',
+      name: 'Introduction',
+      description: 'Welcome and show overview',
+      timecode: '00:00'
+    },
+    {
+      id: '2',
+      name: 'News Recap',
+      description: 'This week\'s tech highlights',
+      timecode: '05:00'
+    },
+    {
+      id: '3',
+      name: 'Guest Interview',
+      description: 'Sarah Johnson, AI Researcher',
+      timecode: '15:00'
+    },
+    {
+      id: '4',
+      name: 'Demo Segment',
+      description: 'Live code demonstration',
+      timecode: '30:00'
+    },
+    {
+      id: '5',
+      name: 'Q&A Session',
+      description: 'Audience questions',
+      timecode: '45:00'
+    },
+    {
+      id: '6',
+      name: 'Closing Remarks',
+      description: 'Summary and next week\'s preview',
+      timecode: '55:00'
+    }
+  ],
+  guests: [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      title: 'AI Research Lead, OpenMind Labs'
+    },
+    {
+      id: '2',
+      name: 'David Chen',
+      title: 'Full Stack Developer, TechStart'
+    },
+    {
+      id: '3',
+      name: 'Maria Rodriguez',
+      title: 'Product Design Director, UXFlow'
+    }
+  ],
+  settings: {
+    chyron: {
+      name: 'John Doe',
+      title: 'Software Engineer',
+      icon: 'users',
+      position: 'top',
+      style: 'default'
+    },
+    display: {
+      theme: 'cupcake',
+      autoSave: false,
+      showTimecodes: true
+    }
+  },
+  activeSegment: '1',
+  activeGuest: null
+};
 ---
 
 <Layout title="Chyron Display">
@@ -9,138 +88,53 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
     <div id="chyron" class="shadow-lg p-12 animate__animated animate__fadeInUp">
       <div class="container mx-auto flex items-center space-x-4">
         <div class="icon-container bg-primary text-primary-content p-3 rounded-full shadow-md">
-          <Users size={28} />
+          {defaultData.settings.chyron.icon === 'users' && <Users size={28} />}
+          {defaultData.settings.chyron.icon === 'award' && <Award size={28} />}
+          {defaultData.settings.chyron.icon === 'info' && <Info size={28} />}
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-primary" id="name">John Doe</h2>
-          <p class="text-lg text-base-content" id="title">Software Engineer</p>
+          <h2 class="text-2xl font-bold text-primary" id="name">{defaultData.settings.chyron.name}</h2>
+          <p class="text-lg text-base-content" id="title">{defaultData.settings.chyron.title}</p>
         </div>
       </div>
     </div>
     
     <!-- Control panel with tabs on the left -->
-    <div class="fixed bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-6 z-10 bg-base-100 shadow-xl rounded-box">
+    <div class="fixed top-[15em] bottom-4 left-0 right-0 mx-auto w-full max-w-5xl p-6 z-10 bg-base-100 shadow-xl rounded-box">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold flex items-center text-primary">
           <ListChecks size={24} class="mr-2" /> Show Rundown
         </h3>
         <div class="flex space-x-2">
-          <button id="settingsBtn" class="btn btn-circle btn-primary btn-outline">
-            <Settings size={20} />
-          </button>
-          <button id="minimizeBtn" class="btn btn-circle btn-secondary">
-            <ChevronDown size={20} />
-          </button>
         </div>
       </div>
       
-      <div id="rundownContainer" class="overflow-y-auto flex-1">
+      <div id="rundownContainer" class="overflow-y-auto h-full">
         <div class="flex">
-          <div class="tabs tabs-vertical tabs-boxed h-full w-40 mr-4 flex flex-col">
-            <button class="tab tab-active text-md font-medium w-full justify-start px-4 py-3 mb-1 bg-primary text-primary-content" id="segmentsTab">Segments</button>
-            <button class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="scriptTab">Script</button>
-            <button class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="guestsTab">Guests</button>
-            <button class="tab text-md font-medium w-full justify-start px-4 py-3 hover:bg-base-300" id="visualsTab">Visuals</button>
+          <div class="tabs tabs-vertical tabs-boxed h-full w-24 mr-4 flex flex-col">
+            <button type="button" class="tab tab-active text-md font-medium w-full justify-start px-4 py-3 mb-1 bg-primary text-primary-content" id="segmentsTab" onclick="window.switchTab('segments'); return false;">Segments</button>
+            <button type="button" class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="scriptTab" onclick="window.switchTab('script'); return false;">Script</button>
+            <button type="button" class="tab text-md font-medium w-full justify-start px-4 py-3 mb-1 hover:bg-base-300" id="guestsTab" onclick="window.switchTab('guests'); return false;">Guests</button>
+            <button type="button" class="tab text-md font-medium w-full justify-start px-4 py-3 hover:bg-base-300" id="visualsTab" onclick="window.switchTab('visuals'); return false;">Settings</button>
           </div>
           
           <div class="flex-1">
             <!-- Segments Tab Content -->
             <div id="segmentsContent" class="space-y-4">
               <div class="segment-list space-y-2">
-                <!-- Default segments -->
-            <div class="segment-item card bg-base-100 p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle btn-primary mr-3 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold text-primary" contenteditable="true">Introduction</h4>
-                    <p class="text-sm opacity-80" contenteditable="true">Welcome and show overview</p>
-                  </div>
-                </div>
-                <span class="badge badge-primary badge-outline">00:00</span>
+                {defaultData.segments.map((segment, index) => (
+                  <SegmentItem 
+                    id={segment.id}
+                    name={segment.name}
+                    description={segment.description}
+                    timecode={segment.timecode}
+                    isActive={segment.id === defaultData.activeSegment}
+                  />
+                ))}
               </div>
+              
+              <button id="addSegmentBtn" class="btn btn-primary btn-outline btn-sm w-full">Add Segment</button>
             </div>
-            
-            <div class="segment-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">News Recap</h4>
-                    <p class="text-sm" contenteditable="true">This week's tech highlights</p>
-                  </div>
-                </div>
-                <span class="badge">05:00</span>
-              </div>
-            </div>
-            
-            <div class="segment-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Guest Interview</h4>
-                    <p class="text-sm" contenteditable="true">Sarah Johnson, AI Researcher</p>
-                  </div>
-                </div>
-                <span class="badge">15:00</span>
-              </div>
-            </div>
-            
-            <div class="segment-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Demo Segment</h4>
-                    <p class="text-sm" contenteditable="true">Live code demonstration</p>
-                  </div>
-                </div>
-                <span class="badge">30:00</span>
-              </div>
-            </div>
-            
-            <div class="segment-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Q&A Session</h4>
-                    <p class="text-sm" contenteditable="true">Audience questions</p>
-                  </div>
-                </div>
-                <span class="badge">45:00</span>
-              </div>
-            </div>
-            
-            <div class="segment-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Closing Remarks</h4>
-                    <p class="text-sm" contenteditable="true">Summary and next week's preview</p>
-                  </div>
-                </div>
-                <span class="badge">55:00</span>
-              </div>
-            </div>
-          </div>
-          
-          <button id="addSegmentBtn" class="btn btn-primary btn-outline btn-sm w-full">Add Segment</button>
-        </div>
         
         <!-- Script Tab Content (Hidden by default) -->
         <div id="scriptContent" class="hidden">
@@ -184,142 +178,140 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         <!-- Guests Tab Content (Hidden by default) -->
         <div id="guestsContent" class="hidden space-y-4">
           <div class="guest-list space-y-2">
-            <div class="guest-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Sarah Johnson</h4>
-                    <p class="text-sm" contenteditable="true">AI Research Lead, OpenMind Labs</p>
-                  </div>
-                </div>
-                <Radio size={16} />
-              </div>
-            </div>
-            
-            <div class="guest-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">David Chen</h4>
-                    <p class="text-sm" contenteditable="true">Full Stack Developer, TechStart</p>
-                  </div>
-                </div>
-                <Radio size={16} />
-              </div>
-            </div>
-            
-            <div class="guest-item card bg-base-200 p-2">
-              <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                  <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
-                    <ChevronRight size={16} />
-                  </button>
-                  <div>
-                    <h4 class="font-bold" contenteditable="true">Maria Rodriguez</h4>
-                    <p class="text-sm" contenteditable="true">Product Design Director, UXFlow</p>
-                  </div>
-                </div>
-                <Radio size={16} />
-              </div>
-            </div>
+            {defaultData.guests.map((guest, index) => (
+              <GuestItem 
+                id={guest.id}
+                name={guest.name}
+                title={guest.title}
+                isActive={guest.id === defaultData.activeGuest}
+              />
+            ))}
           </div>
           
           <button id="addGuestBtn" class="btn btn-outline btn-sm w-full">Add Guest</button>
-            </div>
+        </div>
             
-            <!-- Visuals Tab Content (Hidden by default) -->
+            <!-- Settings Tab Content (Hidden by default) -->
             <div id="visualsContent" class="hidden space-y-6">
-          <div class="card bg-base-100 shadow-sm p-5">
-            <div class="card-title pb-2 text-primary">Chyron Text</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Name</span>
-                </label>
-                <input 
-                  type="text" 
-                  class="input input-bordered input-primary" 
-                  id="nameInput" 
-                  value="John Doe"
-                  oninput="document.getElementById('name').textContent = this.value"
-                />
-              </div>
-              
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Title</span>
-                </label>
-                <input 
-                  type="text" 
-                  class="input input-bordered input-primary" 
-                  id="titleInput" 
-                  value="Software Engineer"
-                  oninput="document.getElementById('title').textContent = this.value"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div class="card bg-base-100 shadow-sm p-5">
-            <div class="card-title pb-2 text-primary">Appearance</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Icon</span>
-                </label>
-                <div class="join">
-                  <button class="join-item btn btn-sm btn-primary" id="userIcon">
-                    <Users size={16} />
-                  </button>
-                  <button class="join-item btn btn-sm" id="awardIcon">
-                    <Award size={16} />
-                  </button>
-                  <button class="join-item btn btn-sm" id="infoIcon">
-                    <Info size={16} />
-                  </button>
+              <div class="card bg-base-100 shadow-sm p-5">
+                <div class="card-title pb-2 text-primary">Chyron Text</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Name</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      class="input input-bordered input-primary" 
+                      id="nameInput" 
+                      value="John Doe"
+                      oninput="document.getElementById('name').textContent = this.value"
+                    />
+                  </div>
+                  
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Title</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      class="input input-bordered input-primary" 
+                      id="titleInput" 
+                      value="Software Engineer"
+                      oninput="document.getElementById('title').textContent = this.value"
+                    />
+                  </div>
                 </div>
               </div>
               
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Position</span>
-                </label>
-                <div class="btn-group">
-                  <input class="btn btn-sm btn-primary" type="radio" name="position" aria-label="Top" id="positionTop" checked />
-                  <input class="btn btn-sm" type="radio" name="position" aria-label="Middle" id="positionMiddle" />
-                  <input class="btn btn-sm" type="radio" name="position" aria-label="Bottom" id="positionBottom" />
+              <div class="card bg-base-100 shadow-sm p-5">
+                <div class="card-title pb-2 text-primary">Appearance</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Icon</span>
+                    </label>
+                    <div class="join">
+                      <button class="join-item btn btn-sm btn-primary" id="userIcon">
+                        <Users size={16} />
+                      </button>
+                      <button class="join-item btn btn-sm" id="awardIcon">
+                        <Award size={16} />
+                      </button>
+                      <button class="join-item btn btn-sm" id="infoIcon">
+                        <Info size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Position</span>
+                    </label>
+                    <div class="btn-group">
+                      <input class="btn btn-sm btn-primary" type="radio" name="position" aria-label="Top" id="positionTop" checked />
+                      <input class="btn btn-sm" type="radio" name="position" aria-label="Middle" id="positionMiddle" />
+                      <input class="btn btn-sm" type="radio" name="position" aria-label="Bottom" id="positionBottom" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Style</span>
-                </label>
-                <div class="btn-group">
-                  <input class="btn btn-sm btn-primary" type="radio" name="options" aria-label="Default" id="styleDefault" checked />
-                  <input class="btn btn-sm" type="radio" name="options" aria-label="Centered" id="styleCentered" />
-                  <input class="btn btn-sm" type="radio" name="options" aria-label="Minimal" id="styleMinimal" />
+                
+                <div class="divider"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Style</span>
+                    </label>
+                    <div class="btn-group">
+                      <input class="btn btn-sm btn-primary" type="radio" name="options" aria-label="Default" id="styleDefault" checked />
+                      <input class="btn btn-sm" type="radio" name="options" aria-label="Centered" id="styleCentered" />
+                      <input class="btn btn-sm" type="radio" name="options" aria-label="Minimal" id="styleMinimal" />
+                    </div>
+                  </div>
+                  
+                  <div class="form-control mt-8">
+                    <button 
+                      class="btn btn-secondary w-full"
+                      id="animateBtn"
+                    >
+                      <RefreshCw size={16} class="mr-2" /> Animate
+                    </button>
+                  </div>
                 </div>
               </div>
               
-              <div class="form-control mt-8">
-                <button 
-                  class="btn btn-secondary w-full"
-                  id="animateBtn"
-                >
-                  <RefreshCw size={16} class="mr-2" /> Animate
-                </button>
-              </div>
+              <div class="card bg-base-100 shadow-sm p-5">
+                <div class="card-title pb-2 text-primary">Display Options</div>
+                
+                <div class="form-control mt-4">
+                  <label class="label">
+                    <span class="label-text font-medium">Theme</span>
+                  </label>
+                  <select class="select select-bordered w-full" id="themeSelect">
+                    <option selected value="cupcake">Cupcake (default)</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="retro">Retro</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                  </select>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-control">
+                  <label class="label cursor-pointer justify-start gap-4">
+                    <input type="checkbox" class="toggle toggle-primary" id="autoSaveToggle" />
+                    <span class="label-text">Auto-save changes</span>
+                  </label>
+                </div>
+                
+                <div class="form-control">
+                  <label class="label cursor-pointer justify-start gap-4">
+                    <input type="checkbox" class="toggle toggle-primary" id="showTimecodesToggle" />
+                    <span class="label-text">Show timecodes</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -328,48 +320,759 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
     </div>
   </main>
 
-  <!-- Settings Modal (hidden by default) -->
-  <div id="settingsModal" class="modal">
-    <div class="modal-box bg-base-100">
-      <h3 class="font-bold text-lg text-primary">Additional Settings</h3>
-      
-      <div class="form-control mt-4">
-        <label class="label">
-          <span class="label-text font-medium">Theme Options</span>
-        </label>
-        <select class="select select-bordered w-full">
-          <option selected>Cupcake (default)</option>
-          <option>Light</option>
-          <option>Dark</option>
-          <option>Retro</option>
-          <option>Cyberpunk</option>
-        </select>
-      </div>
-      
-      <div class="divider"></div>
-      
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start gap-4">
-          <input type="checkbox" class="toggle toggle-primary" />
-          <span class="label-text">Auto-save changes</span>
-        </label>
-      </div>
-      
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start gap-4">
-          <input type="checkbox" class="toggle toggle-primary" />
-          <span class="label-text">Show timecodes</span>
-        </label>
-      </div>
-      
-      <div class="modal-action">
-        <button id="closeSettingsBtn" class="btn btn-primary">Close</button>
-      </div>
-    </div>
-  </div>
 
-  <script>
+  <script is:inline>
+    // Global functions for UI interaction
+    // Segment selection function
+    window.useSegment = function(segmentId) {
+      console.log(`Using segment with ID: ${segmentId}`);
+      
+      // Get the segment from storage
+      const data = persistenceAdapter.getData();
+      const segments = data.segments || [];
+      const segment = segments.find(s => s.id === segmentId);
+      
+      if (!segment) {
+        console.error(`Segment not found: ${segmentId}`);
+        return;
+      }
+      
+      console.log(`Selected segment: ${segment.name}`);
+      
+      // Update chyron display
+      const nameDisplay = document.getElementById('name');
+      const titleDisplay = document.getElementById('title');
+      if (nameDisplay) nameDisplay.textContent = segment.name;
+      if (titleDisplay) titleDisplay.textContent = segment.description;
+      
+      // Update input fields
+      const nameInput = document.getElementById('nameInput');
+      const titleInput = document.getElementById('titleInput');
+      if (nameInput) nameInput.value = segment.name;
+      if (titleInput) titleInput.value = segment.description;
+      
+      // Set as active segment
+      persistenceAdapter.setActiveSegment(segmentId);
+      persistenceAdapter.updateChyronSettings({
+        name: segment.name,
+        title: segment.description
+      });
+      
+      // Refresh the UI
+      renderSegments();
+      
+      // Animate the chyron
+      const chyron = document.getElementById('chyron');
+      if (chyron) {
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      }
+      
+      return false;
+    };
+    
+    // Guest selection function
+    window.useGuest = function(guestId) {
+      console.log(`Using guest with ID: ${guestId}`);
+      
+      // Get the guest from storage
+      const data = persistenceAdapter.getData();
+      const guests = data.guests || [];
+      const guest = guests.find(g => g.id === guestId);
+      
+      if (!guest) {
+        console.error(`Guest not found: ${guestId}`);
+        return;
+      }
+      
+      console.log(`Selected guest: ${guest.name}`);
+      
+      // Update chyron display
+      const nameDisplay = document.getElementById('name');
+      const titleDisplay = document.getElementById('title');
+      if (nameDisplay) nameDisplay.textContent = guest.name;
+      if (titleDisplay) titleDisplay.textContent = guest.title;
+      
+      // Update input fields
+      const nameInput = document.getElementById('nameInput');
+      const titleInput = document.getElementById('titleInput');
+      if (nameInput) nameInput.value = guest.name;
+      if (titleInput) titleInput.value = guest.title;
+      
+      // Set as active guest
+      persistenceAdapter.setActiveGuest(guestId);
+      persistenceAdapter.updateChyronSettings({
+        name: guest.name,
+        title: guest.title
+      });
+      
+      // Refresh the UI
+      renderGuests();
+      
+      // Animate the chyron
+      const chyron = document.getElementById('chyron');
+      if (chyron) {
+        chyron.classList.remove('animate__fadeInUp');
+        void chyron.offsetWidth; // Trigger reflow
+        chyron.classList.add('animate__fadeInUp');
+      }
+      
+      return false;
+    };
+    
+    // Tab switching function
+    window.switchTab = function(tabName) {
+      console.log(`Switching to tab: ${tabName}`);
+      
+      // Get all tab elements
+      const tabs = {
+        segments: {
+          tab: document.getElementById('segmentsTab'),
+          content: document.getElementById('segmentsContent')
+        },
+        script: {
+          tab: document.getElementById('scriptTab'),
+          content: document.getElementById('scriptContent')
+        },
+        guests: {
+          tab: document.getElementById('guestsTab'),
+          content: document.getElementById('guestsContent')
+        },
+        visuals: {
+          tab: document.getElementById('visualsTab'),
+          content: document.getElementById('visualsContent')
+        }
+      };
+      
+      // Hide all tab contents
+      Object.values(tabs).forEach(item => {
+        if (item.content) item.content.classList.add('hidden');
+        if (item.tab) item.tab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+      });
+      
+      // Show selected tab
+      if (tabs[tabName] && tabs[tabName].tab) {
+        tabs[tabName].tab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
+      }
+      
+      if (tabs[tabName] && tabs[tabName].content) {
+        tabs[tabName].content.classList.remove('hidden');
+      }
+      
+      return false;
+    };
+  
+    // Client-side JavaScript for interactivity
+    // We'll use direct DOM manipulation instead of importing modules
+    // Define persistence adapter directly in this script
+    const persistenceAdapter = (function() {
+      // Default data structure with reasonable defaults
+      const DEFAULT_DATA = {
+        segments: [
+          {
+            id: '1',
+            name: 'Introduction',
+            description: 'Welcome and show overview',
+            timecode: '00:00'
+          },
+          {
+            id: '2',
+            name: 'News Recap',
+            description: 'This week\'s tech highlights',
+            timecode: '05:00'
+          },
+          {
+            id: '3',
+            name: 'Guest Interview',
+            description: 'Sarah Johnson, AI Researcher',
+            timecode: '15:00'
+          },
+          {
+            id: '4',
+            name: 'Demo Segment',
+            description: 'Live code demonstration',
+            timecode: '30:00'
+          },
+          {
+            id: '5',
+            name: 'Q&A Session',
+            description: 'Audience questions',
+            timecode: '45:00'
+          },
+          {
+            id: '6',
+            name: 'Closing Remarks',
+            description: 'Summary and next week\'s preview',
+            timecode: '55:00'
+          }
+        ],
+        script: `# Show Script
+
+## Introduction
+- Welcome viewers to the show
+- Introduce today's topics
+- Brief overview of the schedule
+
+## News Recap
+- Tech story 1: Latest Apple announcements
+- Tech story 2: AI developments this week
+- Tech story 3: Open source highlights
+
+## Guest Interview
+- Introduce Sarah Johnson, AI Researcher
+- Question 1: What's your background in AI?
+- Question 2: Current projects and research
+- Question 3: Future of AI ethics
+
+## Demo Segment
+- Setup the demonstration environment
+- Show key features and functionality
+- Explain technical concepts
+
+## Q&A Session
+- Address viewer questions from chat
+- Dive deeper on popular topics
+
+## Closing Remarks
+- Summarize key takeaways
+- Preview next week's topics
+- Thank viewers and sponsors`,
+        guests: [
+          {
+            id: '1',
+            name: 'Sarah Johnson',
+            title: 'AI Research Lead, OpenMind Labs'
+          },
+          {
+            id: '2',
+            name: 'David Chen',
+            title: 'Full Stack Developer, TechStart'
+          },
+          {
+            id: '3',
+            name: 'Maria Rodriguez',
+            title: 'Product Design Director, UXFlow'
+          }
+        ],
+        settings: {
+          chyron: {
+            name: 'John Doe',
+            title: 'Software Engineer',
+            icon: 'users', // users, award, info
+            position: 'top', // top, middle, bottom
+            style: 'default' // default, centered, minimal
+          },
+          display: {
+            theme: 'cupcake',
+            autoSave: false,
+            showTimecodes: true
+          }
+        },
+        activeSegment: null,
+        activeGuest: null
+      };
+
+      // Storage key for the entire application data
+      const STORAGE_KEY = 'chyron_app_data';
+
+      /**
+       * Initialize the storage with default data if it doesn't exist
+       * @returns {Object} The current data
+       */
+      function initStorage() {
+        // Check if we can use localStorage
+        const canUseStorage = typeof window !== 'undefined' && window.localStorage;
+        
+        if (!canUseStorage) {
+          console.warn('LocalStorage is not available. Data will not persist between sessions.');
+          return { ...DEFAULT_DATA };
+        }
+        
+        // Get existing data or initialize with defaults
+        const existingData = localStorage.getItem(STORAGE_KEY);
+        if (!existingData) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+          return { ...DEFAULT_DATA };
+        }
+        
+        try {
+          return JSON.parse(existingData);
+        } catch (error) {
+          console.error('Failed to parse stored data', error);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+          return { ...DEFAULT_DATA };
+        }
+      }
+
+      /**
+       * Get the entire data object
+       * @returns {Object} The current data
+       */
+      function getData() {
+        // Check if we can use localStorage
+        const canUseStorage = typeof window !== 'undefined' && window.localStorage;
+        
+        if (!canUseStorage) {
+          return { ...DEFAULT_DATA };
+        }
+        
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        if (!storedData) {
+          return initStorage();
+        }
+        
+        try {
+          return JSON.parse(storedData);
+        } catch (error) {
+          console.error('Failed to parse stored data', error);
+          return { ...DEFAULT_DATA };
+        }
+      }
+
+      /**
+       * Save the entire data object
+       * @param {Object} data - The data to save
+       */
+      function saveData(data) {
+        // Check if we can use localStorage
+        const canUseStorage = typeof window !== 'undefined' && window.localStorage;
+        
+        if (!canUseStorage) {
+          console.warn('LocalStorage is not available. Data will not persist between sessions.');
+          return;
+        }
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      /**
+       * Get a specific section of data
+       * @param {string} section - The section to get (segments, script, guests, settings)
+       * @returns {any} The requested data section
+       */
+      function getSection(section) {
+        const data = getData();
+        return data[section] || DEFAULT_DATA[section];
+      }
+
+      /**
+       * Update a specific section of data
+       * @param {string} section - The section to update (segments, script, guests, settings)
+       * @param {any} newData - The new data for this section
+       */
+      function updateSection(section, newData) {
+        const data = getData();
+        data[section] = newData;
+        saveData(data);
+      }
+
+      /**
+       * Set the active segment
+       * @param {string} segmentId - The ID of the active segment
+       */
+      function setActiveSegment(segmentId) {
+        const data = getData();
+        data.activeSegment = segmentId;
+        saveData(data);
+      }
+
+      /**
+       * Get the active segment
+       * @returns {Object|null} The active segment or null
+       */
+      function getActiveSegment() {
+        const data = getData();
+        
+        if (!data.activeSegment) {
+          return null;
+        }
+        
+        const segments = data.segments || [];
+        return segments.find(segment => segment.id === data.activeSegment) || null;
+      }
+
+      /**
+       * Set the active guest
+       * @param {string} guestId - The ID of the active guest
+       */
+      function setActiveGuest(guestId) {
+        const data = getData();
+        data.activeGuest = guestId;
+        saveData(data);
+      }
+
+      /**
+       * Get the active guest
+       * @returns {Object|null} The active guest or null
+       */
+      function getActiveGuest() {
+        const data = getData();
+        
+        if (!data.activeGuest) {
+          return null;
+        }
+        
+        const guests = data.guests || [];
+        return guests.find(guest => guest.id === data.activeGuest) || null;
+      }
+
+      /**
+       * Add a new segment
+       * @param {Object} segment - The segment to add
+       * @returns {string} The ID of the new segment
+       */
+      function addSegment(segment) {
+        const data = getData();
+        const segments = data.segments || [];
+        
+        // Generate a new ID
+        const newId = Date.now().toString();
+        const newSegment = {
+          id: newId,
+          ...segment
+        };
+        
+        segments.push(newSegment);
+        data.segments = segments;
+        saveData(data);
+        
+        return newId;
+      }
+
+      /**
+       * Update a segment
+       * @param {string} segmentId - The ID of the segment to update
+       * @param {Object} updates - The updates to apply
+       * @returns {boolean} Whether the update was successful
+       */
+      function updateSegment(segmentId, updates) {
+        const data = getData();
+        const segments = data.segments || [];
+        
+        const index = segments.findIndex(segment => segment.id === segmentId);
+        if (index === -1) {
+          return false;
+        }
+        
+        segments[index] = { ...segments[index], ...updates };
+        data.segments = segments;
+        saveData(data);
+        
+        return true;
+      }
+
+      /**
+       * Delete a segment
+       * @param {string} segmentId - The ID of the segment to delete
+       * @returns {boolean} Whether the deletion was successful
+       */
+      function deleteSegment(segmentId) {
+        const data = getData();
+        const segments = data.segments || [];
+        
+        const filteredSegments = segments.filter(segment => segment.id !== segmentId);
+        if (filteredSegments.length === segments.length) {
+          return false;
+        }
+        
+        data.segments = filteredSegments;
+        
+        // Clear active segment if needed
+        if (data.activeSegment === segmentId) {
+          data.activeSegment = null;
+        }
+        
+        // If we have no segments left but had deleted the last one, select first available
+        if (filteredSegments.length > 0 && segments.length !== filteredSegments.length && data.activeSegment === null) {
+          data.activeSegment = filteredSegments[0].id;
+        }
+        
+        saveData(data);
+        return true;
+      }
+
+      /**
+       * Add a new guest
+       * @param {Object} guest - The guest to add
+       * @returns {string} The ID of the new guest
+       */
+      function addGuest(guest) {
+        const data = getData();
+        const guests = data.guests || [];
+        
+        // Generate a new ID
+        const newId = Date.now().toString();
+        const newGuest = {
+          id: newId,
+          ...guest
+        };
+        
+        guests.push(newGuest);
+        data.guests = guests;
+        saveData(data);
+        
+        return newId;
+      }
+
+      /**
+       * Update a guest
+       * @param {string} guestId - The ID of the guest to update
+       * @param {Object} updates - The updates to apply
+       * @returns {boolean} Whether the update was successful
+       */
+      function updateGuest(guestId, updates) {
+        const data = getData();
+        const guests = data.guests || [];
+        
+        const index = guests.findIndex(guest => guest.id === guestId);
+        if (index === -1) {
+          return false;
+        }
+        
+        guests[index] = { ...guests[index], ...updates };
+        data.guests = guests;
+        saveData(data);
+        
+        return true;
+      }
+
+      /**
+       * Delete a guest
+       * @param {string} guestId - The ID of the guest to delete
+       * @returns {boolean} Whether the deletion was successful
+       */
+      function deleteGuest(guestId) {
+        const data = getData();
+        const guests = data.guests || [];
+        
+        const filteredGuests = guests.filter(guest => guest.id !== guestId);
+        if (filteredGuests.length === guests.length) {
+          return false;
+        }
+        
+        data.guests = filteredGuests;
+        
+        // Clear active guest if needed
+        if (data.activeGuest === guestId) {
+          data.activeGuest = null;
+        }
+        
+        // If we have no guests left but had deleted the last one, select first available
+        if (filteredGuests.length > 0 && guests.length !== filteredGuests.length && data.activeGuest === null) {
+          data.activeGuest = filteredGuests[0].id;
+        }
+        
+        saveData(data);
+        return true;
+      }
+
+      /**
+       * Update the script
+       * @param {string} script - The new script content
+       */
+      function updateScript(script) {
+        const data = getData();
+        data.script = script;
+        saveData(data);
+      }
+
+      /**
+       * Update settings
+       * @param {Object} settings - The new settings
+       */
+      function updateSettings(settings) {
+        const data = getData();
+        data.settings = { ...data.settings, ...settings };
+        saveData(data);
+      }
+
+      /**
+       * Update chyron settings specifically
+       * @param {Object} chyronSettings - The new chyron settings
+       */
+      function updateChyronSettings(chyronSettings) {
+        const data = getData();
+        data.settings.chyron = { ...data.settings.chyron, ...chyronSettings };
+        saveData(data);
+      }
+
+      /**
+       * Update display settings specifically
+       * @param {Object} displaySettings - The new display settings
+       */
+      function updateDisplaySettings(displaySettings) {
+        const data = getData();
+        data.settings.display = { ...data.settings.display, ...displaySettings };
+        saveData(data);
+      }
+
+      // Return the public API
+      return {
+        initStorage,
+        getData,
+        saveData,
+        getSection,
+        updateSection,
+        setActiveSegment,
+        getActiveSegment,
+        setActiveGuest,
+        getActiveGuest,
+        addSegment,
+        updateSegment,
+        deleteSegment,
+        addGuest,
+        updateGuest,
+        deleteGuest,
+        updateScript,
+        updateSettings,
+        updateChyronSettings,
+        updateDisplaySettings
+      };
+    })();
+    
+    // Function to render segments
+    function renderSegments() {
+      const segments = persistenceAdapter.getSection('segments') || [];
+      const segmentList = document.querySelector('.segment-list');
+      const activeSegment = persistenceAdapter.getActiveSegment();
+      
+      // Clear existing segments
+      segmentList.innerHTML = '';
+      
+      // Add segments from storage
+      segments.forEach(segment => {
+        const isActive = segment.id === activeSegment?.id;
+        const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+        const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+        
+        segmentList.innerHTML += `
+          <div class="segment-item card ${cardClass} p-2" data-id="${segment.id}">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <button class="btn btn-sm btn-circle ${buttonClass} mr-2 use-segment-btn" 
+                  type="button" 
+                  onclick="window.useSegment('${segment.id}'); return false;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div>
+                  <h4 class="font-bold" contenteditable="true">${segment.name}</h4>
+                  <p class="text-sm" contenteditable="true">${segment.description}</p>
+                </div>
+              </div>
+              <span class="badge" contenteditable="true">${segment.timecode}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // We're using onclick attributes now, so no need for these event listeners
+      
+      // Add event listeners for contenteditable elements
+      document.querySelectorAll('.segment-item h4, .segment-item p, .segment-item .badge').forEach(el => {
+        el.addEventListener('blur', handleSegmentEdit);
+      });
+    }
+    
+    // Function to render guests
+    function renderGuests() {
+      const guests = persistenceAdapter.getSection('guests') || [];
+      const guestList = document.querySelector('.guest-list');
+      const activeGuest = persistenceAdapter.getActiveGuest();
+      
+      // Clear existing guests
+      guestList.innerHTML = '';
+      
+      // Add guests from storage
+      guests.forEach(guest => {
+        const isActive = guest.id === activeGuest?.id;
+        const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+        const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+        
+        guestList.innerHTML += `
+          <div class="guest-item card ${cardClass} p-2" data-id="${guest.id}">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <button class="btn btn-sm btn-circle ${buttonClass} mr-2 use-guest-btn"
+                  type="button"
+                  onclick="window.useGuest('${guest.id}'); return false;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div>
+                  <h4 class="font-bold" contenteditable="true">${guest.name}</h4>
+                  <p class="text-sm" contenteditable="true">${guest.title}</p>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-radio"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+            </div>
+          </div>
+        `;
+      });
+      
+      // We're using onclick attributes now, so no need for these event listeners
+      
+      // Add event listeners for contenteditable elements
+      document.querySelectorAll('.guest-item h4, .guest-item p').forEach(el => {
+        el.addEventListener('blur', handleGuestEdit);
+      });
+    }
+    
+    // Handle segment edits
+    function handleSegmentEdit(e) {
+      const segmentItem = e.target.closest('.segment-item');
+      const segmentId = segmentItem.getAttribute('data-id');
+      const nameEl = segmentItem.querySelector('h4');
+      const descEl = segmentItem.querySelector('p');
+      const timeEl = segmentItem.querySelector('.badge');
+      
+      persistenceAdapter.updateSegment(segmentId, {
+        name: nameEl.textContent,
+        description: descEl.textContent,
+        timecode: timeEl.textContent
+      });
+    }
+    
+    // Handle guest edits
+    function handleGuestEdit(e) {
+      const guestItem = e.target.closest('.guest-item');
+      const guestId = guestItem.getAttribute('data-id');
+      const nameEl = guestItem.querySelector('h4');
+      const titleEl = guestItem.querySelector('p');
+      
+      persistenceAdapter.updateGuest(guestId, {
+        name: nameEl.textContent,
+        title: titleEl.textContent
+      });
+    }
+    
+    // Define all helper functions at the top level for reference
+    // Function to hide all content panels
+    function hideAllContent() {
+      document.querySelectorAll('#segmentsContent, #scriptContent, #guestsContent, #visualsContent').forEach(content => {
+        content.classList.add('hidden');
+      });
+    }
+    
+    // Function to remove active styling from all tabs
+    function deactivateAllTabs() {
+      document.querySelectorAll('#segmentsTab, #scriptTab, #guestsTab, #visualsTab').forEach(tab => {
+        tab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+      });
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing chyron app');
+      // Initialize storage with defaults if needed
+      persistenceAdapter.initStorage();
+      
+      // Log the existence of tabs for debugging
+      console.log('Tabs:', {
+        segmentsTab: document.getElementById('segmentsTab'),
+        scriptTab: document.getElementById('scriptTab'),
+        guestsTab: document.getElementById('guestsTab'),
+        visualsTab: document.getElementById('visualsTab')
+      });
+      
       // Core elements
       const nameInput = document.getElementById('nameInput');
       const titleInput = document.getElementById('titleInput');
@@ -378,6 +1081,11 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       const chyron = document.getElementById('chyron');
       const animateBtn = document.getElementById('animateBtn');
       const iconContainer = document.querySelector('.icon-container');
+      
+      // Initialize segment and guest button styles
+      document.querySelectorAll('.use-segment-btn, .use-guest-btn').forEach(btn => {
+        btn.classList.add('btn-ghost');
+      });
       
       // Add event listener for all contenteditable elements to handle Enter key
       document.querySelectorAll('[contenteditable="true"]').forEach(element => {
@@ -391,19 +1099,22 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       });
       
       // Control panel elements
-      const settingsBtn = document.getElementById('settingsBtn');
-      const settingsModal = document.getElementById('settingsModal');
-      const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-      const minimizeBtn = document.getElementById('minimizeBtn');
       const rundownContainer = document.getElementById('rundownContainer');
+      
+      // Settings elements
+      const themeSelect = document.getElementById('themeSelect');
+      const autoSaveToggle = document.getElementById('autoSaveToggle');
+      const showTimecodesToggle = document.getElementById('showTimecodesToggle');
       
       // Tabs
       const segmentsTab = document.getElementById('segmentsTab');
       const scriptTab = document.getElementById('scriptTab');
       const guestsTab = document.getElementById('guestsTab');
+      const visualsTab = document.getElementById('visualsTab');
       const segmentsContent = document.getElementById('segmentsContent');
       const scriptContent = document.getElementById('scriptContent');
       const guestsContent = document.getElementById('guestsContent');
+      const visualsContent = document.getElementById('visualsContent');
       
       // Buttons
       const addSegmentBtn = document.getElementById('addSegmentBtn');
@@ -426,264 +1137,514 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
       const styleCentered = document.getElementById('styleCentered');
       const styleMinimal = document.getElementById('styleMinimal');
       
-      // Load saved values
-      if (localStorage.getItem('chyronName')) {
-        nameInput.value = localStorage.getItem('chyronName');
-        nameDisplay.textContent = localStorage.getItem('chyronName');
-      }
-      
-      if (localStorage.getItem('chyronTitle')) {
-        titleInput.value = localStorage.getItem('chyronTitle');
-        titleDisplay.textContent = localStorage.getItem('chyronTitle');
-      }
-      
-      if (localStorage.getItem('chyronIcon')) {
-        iconContainer.innerHTML = localStorage.getItem('chyronIcon');
-      }
-      
-      if (localStorage.getItem('chyronPosition')) {
-        const savedPosition = localStorage.getItem('chyronPosition');
-        if (savedPosition === 'middle') {
-          positionMiddle.checked = true;
-          chyron.classList.remove('mt-20');
-          chyron.classList.add('mt-[40vh]');
-        } else if (savedPosition === 'bottom') {
-          positionBottom.checked = true;
-          chyron.classList.remove('mt-20');
-          chyron.classList.add('mt-[80vh]');
+      // Load data from persistence adapter
+      function loadDataFromStorage() {
+        // Get settings from storage
+        const data = persistenceAdapter.getData();
+        const settings = data.settings;
+        
+        // Get references to DOM elements
+        const nameInput = document.getElementById('nameInput');
+        const titleInput = document.getElementById('titleInput');
+        const nameDisplay = document.getElementById('name');
+        const titleDisplay = document.getElementById('title');
+        const chyron = document.getElementById('chyron');
+        const iconContainer = document.querySelector('.icon-container');
+        
+        // Load Chyron text
+        if (settings?.chyron) {
+          // Update name and title fields
+          nameInput.value = settings.chyron.name;
+          titleInput.value = settings.chyron.title;
+          nameDisplay.textContent = settings.chyron.name;
+          titleDisplay.textContent = settings.chyron.title;
+          
+          // Update icon based on selection
+          if (settings.chyron.icon === 'users') {
+            iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+          } else if (settings.chyron.icon === 'award') {
+            iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>';
+          } else if (settings.chyron.icon === 'info') {
+            iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+          }
+          
+          // Position radio buttons
+          const positionTop = document.getElementById('positionTop');
+          const positionMiddle = document.getElementById('positionMiddle');
+          const positionBottom = document.getElementById('positionBottom');
+          
+          // Update position
+          if (settings.chyron.position === 'middle') {
+            positionMiddle.checked = true;
+            chyron.classList.remove('mt-20', 'mt-[80vh]');
+            chyron.classList.add('mt-[40vh]');
+          } else if (settings.chyron.position === 'bottom') {
+            positionBottom.checked = true;
+            chyron.classList.remove('mt-20', 'mt-[40vh]');
+            chyron.classList.add('mt-[80vh]');
+          } else {
+            positionTop.checked = true;
+            chyron.classList.remove('mt-[40vh]', 'mt-[80vh]');
+            chyron.classList.add('mt-0');
+          }
+          
+          // Style radio buttons
+          const styleDefault = document.getElementById('styleDefault');
+          const styleCentered = document.getElementById('styleCentered');
+          const styleMinimal = document.getElementById('styleMinimal');
+          
+          // Update style
+          if (settings.chyron.style === 'centered') {
+            styleCentered.checked = true;
+            chyron.classList.remove('bg-opacity-30');
+            chyron.classList.add('flex', 'justify-center', 'bg-opacity-70');
+          } else if (settings.chyron.style === 'minimal') {
+            styleMinimal.checked = true;
+            chyron.classList.remove('flex', 'justify-center', 'bg-opacity-70');
+            chyron.classList.add('bg-opacity-30');
+          } else {
+            styleDefault.checked = true;
+            chyron.classList.remove('flex', 'justify-center', 'bg-opacity-30');
+            chyron.classList.add('bg-opacity-70');
+          }
         }
-      }
-      
-      if (localStorage.getItem('chyronStyle')) {
-        const savedStyle = localStorage.getItem('chyronStyle');
-        if (savedStyle === 'centered') {
-          styleCentered.checked = true;
-          chyron.classList.add('flex', 'justify-center');
-        } else if (savedStyle === 'minimal') {
-          styleMinimal.checked = true;
-          chyron.classList.add('bg-opacity-30');
+        
+        // Load display settings
+        if (settings?.display) {
+          // Theme
+          const themeSelect = document.getElementById('themeSelect');
+          const savedTheme = settings.display.theme || 'cupcake';
+          themeSelect.value = savedTheme;
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          
+          // Toggle settings
+          const autoSaveToggle = document.getElementById('autoSaveToggle');
+          const showTimecodesToggle = document.getElementById('showTimecodesToggle');
+          
+          autoSaveToggle.checked = settings.display.autoSave || false;
+          showTimecodesToggle.checked = settings.display.showTimecodes !== false; // Default to true
+          
+          // Apply timecode visibility
+          document.querySelectorAll('.badge').forEach(badge => {
+            badge.classList.toggle('hidden', !showTimecodesToggle.checked);
+          });
         }
+        
+        // Load script content
+        const script = data.script || '';
+        document.getElementById('scriptText').value = script;
       }
       
-      // Script content
-      if (localStorage.getItem('scriptContent')) {
-        document.getElementById('scriptText').value = localStorage.getItem('scriptContent');
+      // Load segments from storage and update UI
+      function loadSegments() {
+        const segments = persistenceAdapter.getSection('segments') || [];
+        const segmentList = document.querySelector('.segment-list');
+        
+        // Clear existing segments
+        segmentList.innerHTML = '';
+        
+        // Add segments from storage
+        segments.forEach(segment => {
+          const segmentEl = document.createElement('div');
+          
+          // Use the active style for the first segment by default 
+          // or if this is the active segment
+          const isActive = segment.id === persistenceAdapter.getActiveSegment()?.id;
+          const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+          const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+          
+          segmentEl.className = `segment-item card ${cardClass} p-2`;
+          segmentEl.setAttribute('data-id', segment.id);
+          segmentEl.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <button class="btn btn-sm btn-circle ${buttonClass} mr-2 use-segment-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div>
+                  <h4 class="font-bold" contenteditable="true">${segment.name}</h4>
+                  <p class="text-sm" contenteditable="true">${segment.description}</p>
+                </div>
+              </div>
+              <span class="badge" contenteditable="true">${segment.timecode}</span>
+            </div>
+          `;
+          
+          segmentList.appendChild(segmentEl);
+          
+          // Add event listener to the segment's use button
+          segmentEl.querySelector('.use-segment-btn').addEventListener('click', useSegmentHandler);
+          
+          // Add event listeners for contenteditable elements
+          const nameEl = segmentEl.querySelector('h4');
+          const descEl = segmentEl.querySelector('p');
+          const timeEl = segmentEl.querySelector('.badge');
+          
+          nameEl.addEventListener('blur', () => {
+            const segmentId = segmentEl.getAttribute('data-id');
+            persistenceAdapter.updateSegment(segmentId, {
+              name: nameEl.textContent,
+              description: descEl.textContent,
+              timecode: timeEl.textContent
+            });
+          });
+          
+          descEl.addEventListener('blur', () => {
+            const segmentId = segmentEl.getAttribute('data-id');
+            persistenceAdapter.updateSegment(segmentId, {
+              name: nameEl.textContent,
+              description: descEl.textContent,
+              timecode: timeEl.textContent
+            });
+          });
+          
+          timeEl.addEventListener('blur', () => {
+            const segmentId = segmentEl.getAttribute('data-id');
+            persistenceAdapter.updateSegment(segmentId, {
+              name: nameEl.textContent,
+              description: descEl.textContent,
+              timecode: timeEl.textContent
+            });
+          });
+        });
       }
       
-      // Save values on input
-      nameInput.addEventListener('input', () => {
-        localStorage.setItem('chyronName', nameInput.value);
-      });
+      // Load guests from storage and update UI
+      function loadGuests() {
+        const guests = persistenceAdapter.getSection('guests') || [];
+        const guestList = document.querySelector('.guest-list');
+        
+        // Clear existing guests
+        guestList.innerHTML = '';
+        
+        // Add guests from storage
+        guests.forEach(guest => {
+          const guestEl = document.createElement('div');
+          
+          // Use the active style for the first guest by default
+          // or if this is the active guest
+          const isActive = guest.id === persistenceAdapter.getActiveGuest()?.id;
+          const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+          const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+          
+          guestEl.className = `guest-item card ${cardClass} p-2`;
+          guestEl.setAttribute('data-id', guest.id);
+          guestEl.innerHTML = `
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <button class="btn btn-sm btn-circle ${buttonClass} mr-2 use-guest-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div>
+                  <h4 class="font-bold" contenteditable="true">${guest.name}</h4>
+                  <p class="text-sm" contenteditable="true">${guest.title}</p>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-radio"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+            </div>
+          `;
+          
+          guestList.appendChild(guestEl);
+          
+          // Add event listener to the guest's use button
+          guestEl.querySelector('.use-guest-btn').addEventListener('click', useGuestHandler);
+          
+          // Add event listeners for contenteditable elements
+          const nameEl = guestEl.querySelector('h4');
+          const titleEl = guestEl.querySelector('p');
+          
+          nameEl.addEventListener('blur', () => {
+            const guestId = guestEl.getAttribute('data-id');
+            persistenceAdapter.updateGuest(guestId, {
+              name: nameEl.textContent,
+              title: titleEl.textContent
+            });
+          });
+          
+          titleEl.addEventListener('blur', () => {
+            const guestId = guestEl.getAttribute('data-id');
+            persistenceAdapter.updateGuest(guestId, {
+              name: nameEl.textContent,
+              title: titleEl.textContent
+            });
+          });
+        });
+      }
       
-      titleInput.addEventListener('input', () => {
-        localStorage.setItem('chyronTitle', titleInput.value);
-      });
+      // Load data from storage and update the UI
+      loadDataFromStorage();
       
-      // Settings modal toggle
-      settingsBtn.addEventListener('click', () => {
-        settingsModal.classList.add('modal-open');
-      });
+      // Render all dynamic elements
+      renderSegments();
+      renderGuests();
       
-      closeSettingsBtn.addEventListener('click', () => {
-        settingsModal.classList.remove('modal-open');
-      });
-      
-      // Minimize/maximize rundown
-      let isMinimized = false;
-      minimizeBtn.addEventListener('click', () => {
-        if (isMinimized) {
-          rundownContainer.classList.remove('hidden');
-          minimizeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
-        } else {
-          rundownContainer.classList.add('hidden');
-          minimizeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>';
-        }
-        isMinimized = !isMinimized;
-      });
-      
-      // Tab switching
-      const visualsTab = document.getElementById('visualsTab');
-      const visualsContent = document.getElementById('visualsContent');
-      
-      // Function to hide all content panels
-      const hideAllContent = () => {
-        segmentsContent.classList.add('hidden');
-        scriptContent.classList.add('hidden');
-        guestsContent.classList.add('hidden');
-        visualsContent.classList.add('hidden');
-      };
-      
-      // Function to remove active styling from all tabs
-      const deactivateAllTabs = () => {
-        segmentsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
-        scriptTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
-        guestsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
-        visualsTab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
-      };
-      
-      segmentsTab.addEventListener('click', () => {
+      // Set up first tab as active
+      if (segmentsTab && segmentsContent) {
         deactivateAllTabs();
         segmentsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
-        
         hideAllContent();
         segmentsContent.classList.remove('hidden');
-      });
-      
-      scriptTab.addEventListener('click', () => {
-        deactivateAllTabs();
-        scriptTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
+        console.log('Initial segments tab activation');
         
-        hideAllContent();
-        scriptContent.classList.remove('hidden');
-      });
+        // Add direct click handler for testing
+        segmentsTab.onclick = function(e) {
+          e.preventDefault();
+          console.log('Direct click handler fired for segments tab');
+          return false;
+        };
+      } else {
+        console.error('Could not find segments tab or content elements', {
+          segmentsTab,
+          segmentsContent
+        });
+      }
       
-      guestsTab.addEventListener('click', () => {
-        deactivateAllTabs();
-        guestsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
+      // Activate first segment or active segment
+      setTimeout(() => {
+        // Try to find active segment or the first segment
+        const activeButton = document.querySelector('.segment-item .btn-primary') || 
+                            document.querySelector('.segment-item .use-segment-btn');
         
-        hideAllContent();
-        guestsContent.classList.remove('hidden');
-      });
+        if (activeButton) {
+          activeButton.click();
+          console.log('Activated segment');
+        }
+      }, 100);
       
-      visualsTab.addEventListener('click', () => {
-        deactivateAllTabs();
-        visualsTab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
+      // Tab switching
+      
+      // Now we're using the global functions defined above
+      
+      // Create a single function to handle tab switching
+      function setupTabHandlers() {
+        const tabs = [
+          { tab: segmentsTab, content: segmentsContent, name: 'Segments' },
+          { tab: scriptTab, content: scriptContent, name: 'Script' },
+          { tab: guestsTab, content: guestsContent, name: 'Guests' },
+          { tab: visualsTab, content: visualsContent, name: 'Settings' }
+        ];
         
-        hideAllContent();
-        visualsContent.classList.remove('hidden');
-      });
+        // Add click handlers to each tab
+        tabs.forEach(item => {
+          if (!item.tab) {
+            console.error(`Tab element missing: ${item.name}`);
+            return;
+          }
+          
+          // Clear any existing handlers
+          item.tab.onclick = null;
+          
+          // Add new handler
+          item.tab.addEventListener('click', function(e) {
+            console.log(`${item.name} tab clicked`);
+            e.preventDefault();
+            
+            // Deactivate all tabs
+            tabs.forEach(t => {
+              if (t.tab) {
+                t.tab.classList.remove('tab-active', 'bg-primary', 'text-primary-content');
+              }
+            });
+            
+            // Hide all content
+            tabs.forEach(t => {
+              if (t.content) {
+                t.content.classList.add('hidden');
+              }
+            });
+            
+            // Activate this tab
+            item.tab.classList.add('tab-active', 'bg-primary', 'text-primary-content');
+            
+            // Show this content
+            if (item.content) {
+              item.content.classList.remove('hidden');
+            } else {
+              console.error(`Content element missing for tab: ${item.name}`);
+            }
+          });
+        });
+        
+        // Also add click handlers to the segmentsTab button attribute
+        segmentsTab.setAttribute('onclick', "console.log('Segments tab clicked via onclick attr')");
+      }
+      
+      // Set up the tab handlers
+      setupTabHandlers();
       
       // Add segment
       addSegmentBtn.addEventListener('click', () => {
-        const segmentList = document.querySelector('.segment-list');
-        const newSegment = document.createElement('div');
-        newSegment.className = 'segment-item card bg-base-200 p-2';
-        newSegment.innerHTML = `
-          <div class="flex justify-between items-center">
-            <div class="flex items-center">
-              <button class="btn btn-sm btn-circle mr-2 use-segment-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-              </button>
-              <div>
-                <h4 class="font-bold" contenteditable="true">New Segment</h4>
-                <p class="text-sm" contenteditable="true">Segment description</p>
-              </div>
-            </div>
-            <span class="badge" contenteditable="true">00:00</span>
-          </div>
-        `;
-        segmentList.appendChild(newSegment);
+        const newSegment = {
+          name: 'New Segment',
+          description: 'Segment description',
+          timecode: '00:00'
+        };
         
-        // Add event listener to the new segment's use button
-        newSegment.querySelector('.use-segment-btn').addEventListener('click', useSegmentHandler);
+        // Add to persistence layer
+        const newId = persistenceAdapter.addSegment(newSegment);
+        
+        // Refresh segments UI
+        renderSegments();
       });
       
       // Add guest
       addGuestBtn.addEventListener('click', () => {
-        const guestList = document.querySelector('.guest-list');
-        const newGuest = document.createElement('div');
-        newGuest.className = 'guest-item card bg-base-200 p-2';
-        newGuest.innerHTML = `
-          <div class="flex justify-between items-center">
-            <div class="flex items-center">
-              <button class="btn btn-sm btn-circle mr-2 use-guest-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-              </button>
-              <div>
-                <h4 class="font-bold" contenteditable="true">New Guest</h4>
-                <p class="text-sm" contenteditable="true">Guest title and organization</p>
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-radio"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
-          </div>
-        `;
-        guestList.appendChild(newGuest);
+        const newGuest = {
+          name: 'New Guest',
+          title: 'Guest title and organization'
+        };
         
-        // Add event listener to the new guest's use button
-        newGuest.querySelector('.use-guest-btn').addEventListener('click', useGuestHandler);
+        // Add to persistence layer
+        const newId = persistenceAdapter.addGuest(newGuest);
+        
+        // Refresh guests UI
+        renderGuests();
       });
       
       // Use segment handler
       function useSegmentHandler(e) {
+        console.log('Segment button clicked');
+        
         const segmentItem = e.currentTarget.closest('.segment-item');
+        const segmentId = segmentItem.getAttribute('data-id');
         const segmentName = segmentItem.querySelector('h4').textContent;
         const segmentDescription = segmentItem.querySelector('p').textContent;
         
+        console.log(`Selected segment: ${segmentName}`);
+        
+        // Update settings in persistence layer
+        persistenceAdapter.updateChyronSettings({
+          name: segmentName,
+          title: segmentDescription
+        });
+        
+        // Set as active segment
+        persistenceAdapter.setActiveSegment(segmentId);
+        
+        // Update the UI
+        renderSegments();
+        
         // Update chyron with segment info
+        const nameDisplay = document.getElementById('name');
+        const titleDisplay = document.getElementById('title');
         nameDisplay.textContent = segmentName;
         titleDisplay.textContent = segmentDescription;
-        localStorage.setItem('chyronName', segmentName);
-        localStorage.setItem('chyronTitle', segmentDescription);
         
         // Update input fields in settings
+        const nameInput = document.getElementById('nameInput');
+        const titleInput = document.getElementById('titleInput');
         nameInput.value = segmentName;
         titleInput.value = segmentDescription;
         
         // Animate the chyron
+        const chyron = document.getElementById('chyron');
         chyron.classList.remove('animate__fadeInUp');
         void chyron.offsetWidth; // Trigger reflow
         chyron.classList.add('animate__fadeInUp');
       }
       
       // Add event listeners to use segment buttons
+      // This needs to be applied to dynamically loaded segments, so it's now handled in loadSegments()
+      // Initial segments only
       useSegmentBtns.forEach(btn => {
-        btn.addEventListener('click', useSegmentHandler);
+        if (btn.onclick === null) {
+          btn.addEventListener('click', useSegmentHandler);
+        }
       });
       
       // Use guest handler
       function useGuestHandler(e) {
+        console.log('Guest button clicked');
+        
         const guestItem = e.currentTarget.closest('.guest-item');
+        const guestId = guestItem.getAttribute('data-id');
         const guestName = guestItem.querySelector('h4').textContent;
         const guestTitle = guestItem.querySelector('p').textContent;
         
+        console.log(`Selected guest: ${guestName}`);
+        
+        // Update settings in persistence layer
+        persistenceAdapter.updateChyronSettings({
+          name: guestName,
+          title: guestTitle
+        });
+        
+        // Set as active guest
+        persistenceAdapter.setActiveGuest(guestId);
+        
+        // Update the UI
+        renderGuests();
+        
         // Update chyron with guest info
+        const nameDisplay = document.getElementById('name');
+        const titleDisplay = document.getElementById('title');
         nameDisplay.textContent = guestName;
         titleDisplay.textContent = guestTitle;
-        localStorage.setItem('chyronName', guestName);
-        localStorage.setItem('chyronTitle', guestTitle);
         
         // Update input fields in settings
+        const nameInput = document.getElementById('nameInput');
+        const titleInput = document.getElementById('titleInput');
         nameInput.value = guestName;
         titleInput.value = guestTitle;
         
         // Animate the chyron
+        const chyron = document.getElementById('chyron');
         chyron.classList.remove('animate__fadeInUp');
         void chyron.offsetWidth; // Trigger reflow
         chyron.classList.add('animate__fadeInUp');
       }
       
       // Add event listeners to use guest buttons
+      // This needs to be applied to dynamically loaded guests, so it's now handled in loadGuests()
+      // Initial guests only
       useGuestBtns.forEach(btn => {
-        btn.addEventListener('click', useGuestHandler);
+        if (btn.onclick === null) {
+          btn.addEventListener('click', useGuestHandler);
+        }
+      });
+      
+      // Save values on input
+      nameInput.addEventListener('input', () => {
+        nameDisplay.textContent = nameInput.value;
+        persistenceAdapter.updateChyronSettings({
+          name: nameInput.value
+        });
+      });
+      
+      titleInput.addEventListener('input', () => {
+        titleDisplay.textContent = titleInput.value;
+        persistenceAdapter.updateChyronSettings({
+          title: titleInput.value
+        });
       });
       
       // Save script content
       document.getElementById('scriptText').addEventListener('input', (e) => {
-        localStorage.setItem('scriptContent', e.target.value);
+        persistenceAdapter.updateScript(e.target.value);
       });
       
       // Icon selection
       userIcon.addEventListener('click', () => {
         iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+        persistenceAdapter.updateChyronSettings({ icon: 'users' });
       });
       
       awardIcon.addEventListener('click', () => {
         iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>';
-        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+        persistenceAdapter.updateChyronSettings({ icon: 'award' });
       });
       
       infoIcon.addEventListener('click', () => {
         iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
-        localStorage.setItem('chyronIcon', iconContainer.innerHTML);
+        persistenceAdapter.updateChyronSettings({ icon: 'info' });
       });
       
       // Position selection
       positionTop.addEventListener('change', () => {
         if (positionTop.checked) {
           chyron.classList.remove('mt-[40vh]', 'mt-[80vh]');
-          chyron.classList.add('mt-20');
-          localStorage.setItem('chyronPosition', 'top');
+          chyron.classList.add('mt-0');
+          persistenceAdapter.updateChyronSettings({ position: 'top' });
         }
       });
       
@@ -691,7 +1652,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         if (positionMiddle.checked) {
           chyron.classList.remove('mt-20', 'mt-[80vh]');
           chyron.classList.add('mt-[40vh]');
-          localStorage.setItem('chyronPosition', 'middle');
+          persistenceAdapter.updateChyronSettings({ position: 'middle' });
         }
       });
       
@@ -699,7 +1660,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         if (positionBottom.checked) {
           chyron.classList.remove('mt-20', 'mt-[40vh]');
           chyron.classList.add('mt-[80vh]');
-          localStorage.setItem('chyronPosition', 'bottom');
+          persistenceAdapter.updateChyronSettings({ position: 'bottom' });
         }
       });
       
@@ -708,7 +1669,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         if (styleDefault.checked) {
           chyron.classList.remove('flex', 'justify-center', 'bg-opacity-30');
           chyron.classList.add('bg-opacity-70');
-          localStorage.setItem('chyronStyle', 'default');
+          persistenceAdapter.updateChyronSettings({ style: 'default' });
         }
       });
       
@@ -716,7 +1677,7 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         if (styleCentered.checked) {
           chyron.classList.remove('bg-opacity-30');
           chyron.classList.add('flex', 'justify-center', 'bg-opacity-70');
-          localStorage.setItem('chyronStyle', 'centered');
+          persistenceAdapter.updateChyronSettings({ style: 'centered' });
         }
       });
       
@@ -724,8 +1685,26 @@ import { Users, Award, Info, Settings, RefreshCw, ChevronRight, ChevronLeft, Lis
         if (styleMinimal.checked) {
           chyron.classList.remove('flex', 'justify-center', 'bg-opacity-70');
           chyron.classList.add('bg-opacity-30');
-          localStorage.setItem('chyronStyle', 'minimal');
+          persistenceAdapter.updateChyronSettings({ style: 'minimal' });
         }
+      });
+      
+      // Theme selection
+      themeSelect.addEventListener('change', () => {
+        document.documentElement.setAttribute('data-theme', themeSelect.value);
+        persistenceAdapter.updateDisplaySettings({ theme: themeSelect.value });
+      });
+      
+      // Toggle settings
+      autoSaveToggle.addEventListener('change', () => {
+        persistenceAdapter.updateDisplaySettings({ autoSave: autoSaveToggle.checked });
+      });
+      
+      showTimecodesToggle.addEventListener('change', () => {
+        persistenceAdapter.updateDisplaySettings({ showTimecodes: showTimecodesToggle.checked });
+        document.querySelectorAll('.badge').forEach(badge => {
+          badge.classList.toggle('hidden', !showTimecodesToggle.checked);
+        });
       });
       
       // Animation

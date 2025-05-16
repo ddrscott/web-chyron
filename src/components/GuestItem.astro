@@ -1,0 +1,42 @@
+---
+// Guest item component for the chyron app
+// Props definition
+interface Props {
+  id: string;
+  name: string;
+  title: string;
+  isActive?: boolean;
+}
+
+// Destructure the props
+const { id, name, title, isActive = false } = Astro.props;
+
+// Determine styling based on active state
+const cardClass = isActive ? 'bg-base-100' : 'bg-base-200';
+const buttonClass = isActive ? 'btn-primary' : 'btn-ghost';
+---
+
+<div class={`guest-item card ${cardClass} p-2`} data-id={id}>
+  <div class="flex justify-between items-center">
+    <div class="flex items-center">
+      <button class={`btn btn-sm btn-circle ${buttonClass} mr-2 use-guest-btn`} type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-chevron-right">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+      <div>
+        <h4 class="font-bold" contenteditable="true">{name}</h4>
+        <p class="text-sm" contenteditable="true">{title}</p>
+      </div>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-radio">
+      <circle cx="12" cy="12" r="2"/>
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+  // Client-side script will be added by the parent component
+  // This is to avoid duplication of event handlers
+</script>
