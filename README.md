@@ -2,6 +2,10 @@
 
 A web-based application for creating and displaying customizable chyrons (graphical overlays) for live streaming and recording.
 
+[![Demo In OBS](docs/screen1.png)]
+
+[![Control Panel](docs/screen2.png)]
+
 ## Features
 
 - Customizable text and icons for streaming overlays
